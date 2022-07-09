@@ -2,6 +2,7 @@
 import '../src/css/Main.css';
 import '../src/css/ErrorPage.css';
 import '../src/css/EventPage.css';
+import './css/Detail.css'
 
 // Route, Link import
 import {Routes, Route} from 'react-router-dom';
@@ -9,6 +10,8 @@ import {Routes, Route} from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 // useState import
 import { useState } from 'react';
+// axios import
+import axios from 'axios';
 
 // Detail Page import
 import DetailPage from './pages/detail';
@@ -21,7 +24,34 @@ import  data  from './utils/data';
 
 
 function App() {
-  let [shoes] = useState(data);
+  let [shoes, setShoes] = useState(data);
+  
+  // shoes state modify
+  let modifyShoes = (data) => {
+    let copy = [...shoes];
+    copy.push(data);
+    setShoes(copy.flat()); 
+  }
+
+  let [loadingState, setLoadingState] = useState(false);
+
+  // 더보기 버튼 누를 시 추가 데이터 가져오기 위한 함수
+  let getItem = async () => {
+    try {
+      if(buttonCount > 3) {
+        alert('더 이상 상품 목록이 없습니다.');
+      } else {
+        let res = await axios.get(`https://codingapple1.github.io/shop/data${buttonCount}.json`);
+        modifyShoes(res.data);
+      }
+    } catch(err) {
+      console.log('error');
+    }
+  }
+
+  // 더보기 버튼 횟수 세기 위한 state
+  let[buttonCount, setButtonCount] = useState(2);
+
   return (
     <div className="App">
       <NavigationBar></NavigationBar>      
@@ -31,6 +61,18 @@ function App() {
                   <>
                     <MainImg></MainImg>
                     <MainLayout shoes={shoes}></MainLayout>
+                    <div className='containerRow'>
+                      { loadingState === true ? <div>로딩중입니다.</div> : '' }
+                      <button 
+                        className='mt-4 btn btn-primary'
+                        onClick={()=>{
+                          setLoadingState(true);
+                          setButtonCount(buttonCount+1); 
+                          getItem();
+                          setLoadingState(false);
+                        }}
+                      >더보기</button>
+                    </div>
                   </>
                  }
           />
