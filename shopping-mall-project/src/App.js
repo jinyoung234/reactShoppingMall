@@ -9,7 +9,7 @@ import {Routes, Route} from 'react-router-dom';
 // Outlet import
 import { Outlet } from 'react-router-dom';
 // useState import
-import { useState } from 'react';
+import { useState, createContext } from 'react';
 // axios import
 import axios from 'axios';
 
@@ -22,6 +22,8 @@ import { MainImg, MainLayout } from './pages/main';
 // data import
 import  data  from './utils/data';
 
+// 상태 관리 위한 context create
+export let Context = createContext()
 
 function App() {
   let [shoes, setShoes] = useState(data);
@@ -52,6 +54,8 @@ function App() {
   // 더보기 버튼 횟수 세기 위한 state
   let[buttonCount, setButtonCount] = useState(2);
 
+  let[stock,setStock] = useState([10,11,12])
+
   return (
     <div className="App">
       <NavigationBar></NavigationBar>      
@@ -79,7 +83,9 @@ function App() {
           <Route path="/detail/:id" 
                  element={
                  <>
-                    <DetailPage shoes={shoes}></DetailPage>                
+                    <Context.Provider value={{stock, shoes}}>
+                      <DetailPage shoes={shoes}></DetailPage>                                      
+                    </Context.Provider>
                  </> 
                  }
           />
